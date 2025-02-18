@@ -25,6 +25,11 @@ st.title("CFTC-Set Up")
 # Get API Key from Streamlit Secrets
 api_key = st.secrets.get("NASDAQ_API_KEY", None)
 
+if api_key:
+    st.success(f"API Key Loaded: {api_key[:5]}******")
+else:
+    st.error("API Key is missing or not accessible!")
+
 if not api_key:
     st.error("API Key is missing! Please add it in Streamlit Secrets.")
 else:
