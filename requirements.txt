@@ -1,0 +1,5 @@
+pandas
+numpy
+plotly
+nasdaq-data-link
+streamlit
