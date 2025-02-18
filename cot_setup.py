@@ -1,6 +1,9 @@
 import nasdaqdatalink
 import streamlit as st
 
+import streamlit as st
+import nasdaqdatalink
+
 st.set_page_config(page_title="CFTC Monitor", layout="wide")
 
 # Initialize session state variables if they don’t exist
@@ -16,20 +19,23 @@ if "instrument_code" not in st.session_state:
 if "selected_type_category" not in st.session_state:
     st.session_state.selected_type_category = ""
 
-
-
 # Streamlit UI
 st.title("CFTC-Set Up")
 
-# API Key input
-nasdaqdatalink.ApiConfig.api_key = st.secrets["NASDAQ_API_KEY"]
+# Get API Key from Streamlit Secrets
+api_key = st.secrets.get("NASDAQ_API_KEY", None)
 
+if not api_key:
+    st.error("API Key is missing! Please add it in Streamlit Secrets.")
+else:
+    nasdaqdatalink.ApiConfig.api_key = api_key
 
+# Button to confirm API key
 if st.button("Submit API Key"):
-    if not nasdaqdatalink.ApiConfig.api_key:
+    if not api_key:
         st.error("API Key is required!")
     else:
-        st.session_state.api_key = nasdaqdatalink.ApiConfig.api_key  # Store API key in session state
+        st.session_state.api_key = api_key  # Store API key in session state
         st.success("API Key saved successfully!")
 
 # Dataset selection dropdown

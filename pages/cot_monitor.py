@@ -4,27 +4,40 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+
+
 st.title("CFTC Monitor - Data Analysis")
 
-
-
 # Load API Key from Streamlit Secrets
-nasdaqdatalink.ApiConfig.api_key = st.secrets["NASDAQ_API_KEY"]
+api_key = st.secrets.get("NASDAQ_API_KEY", None)
+
+if not api_key:
+    st.error("API Key is missing! Please add it in Streamlit Secrets.")
+    st.stop()  # Stop execution if no API key is found
+
+nasdaqdatalink.ApiConfig.api_key = api_key
+
+# Retrieve parameters from session state
+if "dataset_code" not in st.session_state or "instrument_code" not in st.session_state or "selected_type_category" not in st.session_state:
+    st.error("Missing dataset parameters! Please go back to the setup page.")
+    st.stop()
+
 dataset_code = st.session_state.dataset_code
 instrument_code = st.session_state.instrument_code
 type_category = st.session_state.selected_type_category
 
-st.success(f"Using API Key: {nasdaqdatalink.ApiConfig.api_key[:5]}******")
+st.success(f"Using API Key: {api_key[:5]}******")
 st.write(f"**Dataset Code:** {dataset_code}")
 st.write(f"**Instrument Code:** {instrument_code}")
 st.write(f"**Type & Category:** {type_category}")
 
 # Fetch full data initially
 data = nasdaqdatalink.get_table(
-    st.session_state.dataset_code,  # Example: 'QDL/FON'
-    contract_code=st.session_state.instrument_code,  # Example: '067651'
-    type=st.session_state.selected_type_category  # Example: 'F_ALL', 'FO_CHG'
+    dataset_code,  # Example: 'QDL/FON'
+    contract_code=instrument_code,  # Example: '067651'
+    type=type_category  # Example: 'F_ALL', 'FO_CHG'
 )
+
 # Display raw data first
 st.subheader("Raw Data")
 st.dataframe(data)  # Show full table
