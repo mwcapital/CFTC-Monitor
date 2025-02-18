@@ -22,14 +22,14 @@ if "selected_type_category" not in st.session_state:
 st.title("CFTC-Set Up")
 
 # API Key input
-api_key = st.secrets["NASDAQ_API_KEY"]
+nasdaqdatalink.ApiConfig.api_key = st.secrets["NASDAQ_API_KEY"]
 
 
 if st.button("Submit API Key"):
-    if not api_key:
+    if not nasdaqdatalink.ApiConfig.api_key:
         st.error("API Key is required!")
     else:
-        st.session_state.api_key = api_key  # Store API key in session state
+        st.session_state.api_key = nasdaqdatalink.ApiConfig.api_key  # Store API key in session state
         st.success("API Key saved successfully!")
 
 # Dataset selection dropdown

@@ -7,13 +7,14 @@ import numpy as np
 st.title("CFTC Monitor - Data Analysis")
 
 
+
 # Load API Key from Streamlit Secrets
-api_key = st.secrets["NASDAQ_API_KEY"]
+nasdaqdatalink.ApiConfig.api_key = st.secrets["NASDAQ_API_KEY"]
 dataset_code = st.session_state.dataset_code
 instrument_code = st.session_state.instrument_code
 type_category = st.session_state.selected_type_category
 
-st.success(f"Using API Key: {api_key[:5]}******")
+st.success(f"Using API Key: {nasdaqdatalink.ApiConfig.api_key[:5]}******")
 st.write(f"**Dataset Code:** {dataset_code}")
 st.write(f"**Instrument Code:** {instrument_code}")
 st.write(f"**Type & Category:** {type_category}")
