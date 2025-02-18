@@ -22,8 +22,7 @@ if "selected_type_category" not in st.session_state:
 st.title("CFTC-Set Up")
 
 # API Key input
-api_key = st.text_input("Enter your Nasdaq Data Link API Key - Lfzdy9CuRUL-xnywmDPy", type="password",
-                        value=st.session_state.api_key)
+api_key = st.secrets["NASDAQ_API_KEY"]
 
 
 if st.button("Submit API Key"):
