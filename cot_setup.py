@@ -1,6 +1,7 @@
 import nasdaqdatalink
 import streamlit as st
-
+import os
+import toml
 import streamlit as st
 import nasdaqdatalink
 
@@ -20,28 +21,36 @@ if "selected_type_category" not in st.session_state:
     st.session_state.selected_type_category = ""
 
 # Streamlit UI
-st.title("CFTC-Set Up")
+st.title("CFTC - Set Up")
 
-# Get API Key from Streamlit Secrets
-api_key = st.secrets.get("NASDAQ_API_KEY", None)
+# Try loading from local secrets.toml first
+api_key = st.session_state.api_key  # Use session state if already set
 
-if api_key:
-    st.success(f"API Key Loaded: {api_key[:5]}******")
-else:
-    st.error("API Key is missing or not accessible!")
+if not api_key and os.path.exists("secrets.toml"):
+    try:
+        local_secrets = toml.load("secrets.toml")
+        api_key = local_secrets.get("NASDAQ_API_KEY")
+    except Exception as e:
+        st.error(f"Error loading local secrets: {e}")
 
+# If not found locally, load from Streamlit Cloud secrets
 if not api_key:
-    st.error("API Key is missing! Please add it in Streamlit Secrets.")
-else:
-    nasdaqdatalink.ApiConfig.api_key = api_key
+    api_key = st.secrets.get("NASDAQ_API_KEY", None)
+
+# Handle missing API key
+if not api_key:
+    st.error("API Key is missing! Please add it in Streamlit Secrets or `secrets.toml`.")
+    st.stop()  # Stop execution if no API key is found
+
+# Store API Key in session state & configure Nasdaq Data Link
+st.session_state.api_key = api_key
+nasdaqdatalink.ApiConfig.api_key = api_key
+
+st.success(f"Using API Key: {api_key[:5]}******")
 
 # Button to confirm API key
 if st.button("Submit API Key"):
-    if not api_key:
-        st.error("API Key is required!")
-    else:
-        st.session_state.api_key = api_key  # Store API key in session state
-        st.success("API Key saved successfully!")
+    st.success("API Key saved successfully!")
 
 # Dataset selection dropdown
 dataset_code = st.selectbox(

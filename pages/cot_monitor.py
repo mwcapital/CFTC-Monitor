@@ -4,21 +4,38 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
-
+import os
+import toml
 
 st.title("CFTC Monitor - Data Analysis")
 
-# Load API Key from Streamlit Secrets
-api_key = st.secrets.get("NASDAQ_API_KEY", None)
+# Try loading API Key from local file
+api_key = st.session_state.get("api_key", None)  # Use session state if already set
 
+if not api_key and os.path.exists("secrets.toml"):
+    try:
+        local_secrets = toml.load("secrets.toml")
+        api_key = local_secrets.get("NASDAQ_API_KEY")
+    except Exception as e:
+        st.error(f"Error loading local secrets: {e}")
+
+# If not found locally, try getting from Streamlit Cloud
 if not api_key:
-    st.error("API Key is missing! Please add it in Streamlit Secrets.")
-    st.stop()  # Stop execution if no API key is found
+    api_key = st.secrets.get("NASDAQ_API_KEY", None)
 
+# Handle missing API key
+if not api_key:
+    st.error("API Key is missing! Please add it in Streamlit Secrets or `secrets.toml`.")
+    st.stop()
+
+# Set API Key for Nasdaq Data Link & store in session state
+st.session_state.api_key = api_key
 nasdaqdatalink.ApiConfig.api_key = api_key
 
+st.success(f"Using API Key: {api_key[:5]}******")
+
 # Retrieve parameters from session state
-if "dataset_code" not in st.session_state or "instrument_code" not in st.session_state or "selected_type_category" not in st.session_state:
+if not all(key in st.session_state for key in ["dataset_code", "instrument_code", "selected_type_category"]):
     st.error("Missing dataset parameters! Please go back to the setup page.")
     st.stop()
 
@@ -26,7 +43,6 @@ dataset_code = st.session_state.dataset_code
 instrument_code = st.session_state.instrument_code
 type_category = st.session_state.selected_type_category
 
-st.success(f"Using API Key: {api_key[:5]}******")
 st.write(f"**Dataset Code:** {dataset_code}")
 st.write(f"**Instrument Code:** {instrument_code}")
 st.write(f"**Type & Category:** {type_category}")
