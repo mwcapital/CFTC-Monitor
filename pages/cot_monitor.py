@@ -168,3 +168,53 @@ if st.session_state.dataset_code == "QDL/FON":
 
 
 ######################PLOTTING THE QDL/FON ONLY HERE#############################
+
+# Market Participation Chart
+if st.session_state.dataset_code == "QDL/LFON":
+    st.subheader("Market Participation Over Time")
+
+    fig1 = px.line(data, x="date", y="market_participation", title="Market Participation Over Time")
+    fig1.update_layout(legend=dict(orientation="h", y=-0.2))
+    add_highlight_regions(fig1)
+    st.plotly_chart(fig1, use_container_width=True)
+
+    # Long & Short Positions Chart
+    st.subheader("Long & Short Positions by Participant Type")
+
+    longs_columns_to_plot = [
+        "non_commercial_longs",
+        "commercial_longs",
+        "total_reportable_longs",
+        "non_reportable_longs"
+    ]
+    shorts_columns_to_plot = [
+        "non_commercial_shorts",
+        "commercial_shorts",
+        "total_reportable_shorts",
+        "non_reportable_shorts"
+    ]
+
+    selected_longs = [col for col in longs_columns_to_plot if
+                      st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+    selected_shorts = [col for col in shorts_columns_to_plot if
+                       st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+
+    if selected_longs or selected_shorts:
+        fig2 = px.line(data, x="date", y=selected_longs + selected_shorts,
+                       title="Long & Short Positions by Participant Type")
+        fig2.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig2)
+        st.plotly_chart(fig2, use_container_width=True)
+
+    # Spreads Chart
+    st.subheader("Spread Positions by Participant Type")
+    spreads_columns_to_plot = ["non_commercial_spreads"]
+
+    selected_spreads = [col for col in spreads_columns_to_plot if
+                        st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+
+    if selected_spreads:
+        fig3 = px.line(data, x="date", y=selected_spreads, title="Spread Positions by Participant Type")
+        fig3.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig3)
+        st.plotly_chart(fig3, use_container_width=True)
