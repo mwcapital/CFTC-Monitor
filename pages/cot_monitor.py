@@ -148,5 +148,23 @@ if st.session_state.dataset_code == "QDL/FON":
         add_highlight_regions(fig2)
         st.plotly_chart(fig2, use_container_width=True)
 
+    # New: Spreads Chart
+    st.subheader("Spreads by Participant Type")
+
+    spread_columns_to_plot = {
+        "swap_dealer_spreads": "Swap Dealer Spreads",
+        "money_manager_spreads": "Money Manager Spreads",
+        "other_reportable_spreads": "Other Reportable Spreads"
+    }
+
+    selected_spread_series = [col for col in spread_columns_to_plot if st.checkbox(f"Show {spread_columns_to_plot[col]}", value=True)]
+
+    if selected_spread_series:
+        fig3 = px.line(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
+
+        fig3.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig3)
+        st.plotly_chart(fig3, use_container_width=True)
+
 
 ######################PLOTTING THE QDL/FON ONLY HERE#############################
