@@ -218,3 +218,31 @@ if st.session_state.dataset_code == "QDL/LFON":
         fig3.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig3)
         st.plotly_chart(fig3, use_container_width=True)
+
+
+######################PLOTTING THE QDL/FCR ONLY HERE#############################
+
+if st.session_state.dataset_code == "QDL/FCR":
+    st.subheader("Concentration Ratios: Largest Traders")
+
+    concentration_columns = {
+        "largest_4_longs_gross": "Top 4 Largest Traders (Gross Long Positions)",
+        "largest_4_shorts_gross": "Top 4 Largest Traders (Gross Short Positions)",
+        "largest_8_longs_gross": "Top 8 Largest Traders (Gross Long Positions)",
+        "largest_8_shorts_gross": "Top 8 Largest Traders (Gross Short Positions)",
+        "largest_4_longs_net": "Top 4 Largest Traders (Net Long Positions)",
+        "largest_4_shorts_net": "Top 4 Largest Traders (Net Short Positions)",
+        "largest_8_longs_net": "Top 8 Largest Traders (Net Long Positions)",
+        "largest_8_shorts_net": "Top 8 Largest Traders (Net Short Positions)"
+    }
+
+    selected_series = [col for col in concentration_columns if st.checkbox(
+        f"Show {concentration_columns[col]}", value=True,
+        help="Displays data for the selected group of large traders."
+    )]
+
+    if selected_series:
+        fig = px.line(data, x="date", y=selected_series, title="Concentration Ratios: Largest Traders")
+        fig.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig)
+        st.plotly_chart(fig, use_container_width=True)
