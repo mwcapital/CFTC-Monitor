@@ -71,7 +71,7 @@ if start_date and end_date:
 else:
     st.info("Select a date range to filter the data.")
 
-######################PLOTTING THE QDL/FON ONLY HERE#############################
+######################highliting the desired period#############################
 
 # Convert date column to datetime format
 data["date"] = pd.to_datetime(data["date"])
@@ -100,7 +100,7 @@ def add_highlight_regions(fig):
             opacity=0.9, layer="below",
             line_width=2, line_color="black"
         )
-
+######################PLOTTING THE QDL/FON ONLY HERE#############################
 # Market Participation Chart
 if st.session_state.dataset_code == "QDL/FON":
     st.subheader("Market Participation Over Time")
@@ -110,40 +110,43 @@ if st.session_state.dataset_code == "QDL/FON":
     add_highlight_regions(fig1)
     st.plotly_chart(fig1, use_container_width=True)
 
-    # Long Positions Chart
-    st.subheader("Long Positions by Participant Type")
+    # Combined Long & Short Positions Chart
+    st.subheader("Participant Positions (Long & Short)")
 
-    long_columns_to_plot = [
-        "producer_merchant_processor_user_longs",
-        "swap_dealer_longs",
-        "money_manager_longs",
-        "other_reportable_longs",
-        "non_reportable_longs"
-    ]
+    long_columns_to_plot = {
+        "producer_merchant_processor_user_longs": "Producer Longs",
+        "swap_dealer_longs": "Swap Dealer Longs",
+        "money_manager_longs": "Money Manager Longs",
+        "other_reportable_longs": "Other Reportable Longs",
+        "non_reportable_longs": "Non-Reportable Longs"
+    }
 
-    selected_long_series = [col for col in long_columns_to_plot if st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+    short_columns_to_plot = {
+        "producer_merchant_processor_user_shorts": "Producer Shorts",
+        "swap_dealer_shorts": "Swap Dealer Shorts",
+        "money_manager_shorts": "Money Manager Shorts",
+        "other_reportable_shorts": "Other Reportable Shorts",
+        "non_reportable_shorts": "Non-Reportable Shorts"
+    }
 
-    if selected_long_series:
-        fig2 = px.line(data, x="date", y=selected_long_series, title="Long Positions by Participant Type")
+    selected_long_series = [col for col in long_columns_to_plot if st.checkbox(f"Show {long_columns_to_plot[col]}", value=True)]
+    selected_short_series = [col for col in short_columns_to_plot if st.checkbox(f"Show {short_columns_to_plot[col]}", value=True)]
+
+    combined_series = selected_long_series + selected_short_series
+
+    if combined_series:
+        fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+
+        # Set colors for longs vs. shorts
+        for trace in fig2.data:
+            if trace.name in long_columns_to_plot.values():
+                trace.line.color = "green"  # Long positions
+            elif trace.name in short_columns_to_plot.values():
+                trace.line.color = "red"  # Short positions
+
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig2)
         st.plotly_chart(fig2, use_container_width=True)
 
-    # Short Positions Chart
-    st.subheader("Short Positions by Participant Type")
 
-    short_columns_to_plot = [
-        "producer_merchant_processor_user_shorts",
-        "swap_dealer_shorts",
-        "money_manager_shorts",
-        "other_reportable_shorts",
-        "non_reportable_shorts"
-    ]
-
-    selected_short_series = [col for col in short_columns_to_plot if st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
-
-    if selected_short_series:
-        fig3 = px.line(data, x="date", y=selected_short_series, title="Short Positions by Participant Type")
-        fig3.update_layout(legend=dict(orientation="h", y=-0.2))
-        add_highlight_regions(fig3)
-        st.plotly_chart(fig3, use_container_width=True)
+######################PLOTTING THE QDL/FON ONLY HERE#############################
