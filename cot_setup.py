@@ -134,24 +134,24 @@ The dataset is structured into three main parts: **Type, Category, and Sub-categ
 
 
 
-### **1️ Choose Core Dataset **
+### **1 Choose Core Dataset **
 This defines the **scope** of the report.
 - **FO** – Futures and Options Combined 
 - **F** – Futures Only 
  
 
-### **if you want legacy tick the legacy too**
+### **2 if you want legacy tick the legacy too**
 
-### ***️Choose  Category (Position Type)**
+### **3 Choose  Category (Position Type)**
 This specifies how positions are categorized.
 - **ALL** – All positions included  
 - **CHG** – Changes in positions   
  
 
-### ** Choose Sub category **
+### **4 Choose Sub category **
 These sub-categories provide additional analysis:
 - **_CR** – Concentration Ratios: Largest traders’ positions   
-this is needed if you want to see top 4 longs and shorts*
+(this is needed if you want to see top 4 longs and shorts)
 - **_NT** – Number of Traders in the market 
 - **_OI** – Open Interest: Total outstanding contracts   
 
