@@ -76,16 +76,25 @@ instrument_mapping = {
 selected_instrument = st.selectbox("Select Instrument", list(instrument_mapping.keys()))
 instrument_code = instrument_mapping[selected_instrument]
 
-## Checkbox for Legacy mode
-use_legacy = st.checkbox("Legacy")
 
-# Update options based on checkbox state
-if use_legacy:
-    type_category_options = ["F_L_ALL", "F_L_CHG", "FO_L_ALL", "FO_L_CHG"]
-else:
-    type_category_options = ["F_ALL", "F_CHG", "FO_ALL", "FO_CHG"]
+# Checkbox for Legacy selection
+use_legacy = st.checkbox("Use Legacy Format", value=False)
 
-# Dropdown for selecting Type + Category
+# Dropdown for selecting F or FO
+base_type = st.selectbox("Select Base Type", ["F", "FO"])
+
+# Dropdown for selecting _ALL or _CHG
+all_or_chg = st.selectbox("Select Data Type", ["ALL", "CHG"])
+
+# Multi-select for optional suffix (_CR, _NT, _OI)
+suffix_options = ["_CR", "_NT", "_OI"]
+selected_suffixes = st.multiselect("Select Additional Categories", suffix_options)
+
+# Construct the type category dynamically
+prefix = f"{base_type}_L" if use_legacy else base_type
+type_category_options = [f"{prefix}_{all_or_chg}{suffix}" for suffix in [""] + selected_suffixes]
+
+# Dropdown for selecting the final Type & Category
 selected_type_category = st.selectbox("Select Type & Category", type_category_options)
 
 # Store parameters in session state
@@ -94,4 +103,3 @@ st.session_state.instrument_code = instrument_code
 st.session_state.selected_type_category = selected_type_category
 
 st.write("Go to the **COT Monitor** page to view analysis.")
-
