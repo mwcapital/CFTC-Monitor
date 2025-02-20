@@ -167,7 +167,7 @@ if st.session_state.dataset_code == "QDL/FON":
         st.plotly_chart(fig3, use_container_width=True)
 
 
-######################PLOTTING THE QDL/FON ONLY HERE#############################
+######################PLOTTING THE QDL/LFON ONLY HERE#############################
 
 # Market Participation Chart
 if st.session_state.dataset_code == "QDL/LFON":

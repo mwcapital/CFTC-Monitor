@@ -76,8 +76,16 @@ instrument_mapping = {
 selected_instrument = st.selectbox("Select Instrument", list(instrument_mapping.keys()))
 instrument_code = instrument_mapping[selected_instrument]
 
-# Single dropdown for Type + Category combination
-type_category_options = ["F_ALL", "F_CHG", "FO_ALL", "FO_CHG"]
+## Checkbox for Legacy mode
+use_legacy = st.checkbox("Legacy")
+
+# Update options based on checkbox state
+if use_legacy:
+    type_category_options = ["F_L_ALL", "F_L_CHG", "FO_L_ALL", "FO_L_CHG"]
+else:
+    type_category_options = ["F_ALL", "F_CHG", "FO_ALL", "FO_CHG"]
+
+# Dropdown for selecting Type + Category
 selected_type_category = st.selectbox("Select Type & Category", type_category_options)
 
 # Store parameters in session state
@@ -86,3 +94,4 @@ st.session_state.instrument_code = instrument_code
 st.session_state.selected_type_category = selected_type_category
 
 st.write("Go to the **COT Monitor** page to view analysis.")
+
