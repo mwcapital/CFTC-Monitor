@@ -128,6 +128,42 @@ st.session_state.selected_type_category = selected_type_category
 st.write("Go to the **COT Monitor** page to view analysis.")
 
 st.markdown("""
+## 📌 Understanding the Report Structure
+
+The dataset is structured into three main parts: **Type, Category, and Sub-category**.
+
+
+
+### **1️ Choose Core Dataset **
+This defines the **scope** of the report.
+- **FO** – Futures and Options Combined 
+- **F** – Futures Only 
+ 
+
+### **if you want legacy tick the legacy too**
+
+### ***️Choose  Category (Position Type)**
+This specifies how positions are categorized.
+- **ALL** – All positions included  
+- **CHG** – Changes in positions   
+ 
+
+### ** Choose Sub category **
+These sub-categories provide additional analysis:
+- **_CR** – Concentration Ratios: Largest traders’ positions   
+this is needed if you want to see top 4 longs and shorts*
+- **_NT** – Number of Traders in the market 
+- **_OI** – Open Interest: Total outstanding contracts   
+
+You can select different combinations of these to customize your analysis.
+
+""")
+
+
+
+
+
+st.markdown("""
 ## Understanding Legacy vs. Non-Legacy CFTC Reports  
 
 ### Legacy Reports  
@@ -157,6 +193,6 @@ This version provides better transparency on speculative vs. hedging activity.
 | **Transparency**     | Lower                | Higher                     |
 
 **When to Use Each:**  
-- Use **Legacy Reports** for long-term historical analysis (pre-2009).  
+- Use **Legacy Reports** for long-term historical analysis .  
 - Use **Non-Legacy Reports** for more precise trader classification.  
 """)
