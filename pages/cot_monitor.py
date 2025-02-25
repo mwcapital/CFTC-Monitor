@@ -101,6 +101,7 @@ def add_highlight_regions(fig):
             line_width=2, line_color="black"
         )
 ######################PLOTTING THE QDL/FON ONLY HERE#############################
+######################PLOTTING THE QDL/FON ONLY HERE#############################
 # Market Participation Chart
 if st.session_state.dataset_code == "QDL/FON":
     st.subheader("Market Participation Over Time")
@@ -109,6 +110,9 @@ if st.session_state.dataset_code == "QDL/FON":
     fig1.update_layout(legend=dict(orientation="h", y=-0.2))
     add_highlight_regions(fig1)
     st.plotly_chart(fig1, use_container_width=True)
+
+    # Check if _CHG is in selected type category
+    use_bar_charts = "_CHG" in st.session_state.selected_type_category
 
     # Combined Long & Short Positions Chart
     st.subheader("Participant Positions (Long & Short)")
@@ -129,20 +133,25 @@ if st.session_state.dataset_code == "QDL/FON":
         "non_reportable_shorts": "Non-Reportable Shorts"
     }
 
-    selected_long_series = [col for col in long_columns_to_plot if st.checkbox(f"Show {long_columns_to_plot[col]}", value=True)]
-    selected_short_series = [col for col in short_columns_to_plot if st.checkbox(f"Show {short_columns_to_plot[col]}", value=True)]
+    selected_long_series = [col for col in long_columns_to_plot if
+                            st.checkbox(f"Show {long_columns_to_plot[col]}", value=True)]
+    selected_short_series = [col for col in short_columns_to_plot if
+                             st.checkbox(f"Show {short_columns_to_plot[col]}", value=True)]
 
     combined_series = selected_long_series + selected_short_series
 
     if combined_series:
-        fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+        if use_bar_charts:
+            fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+        else:
+            fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
 
         # Set colors for longs vs. shorts
         for trace in fig2.data:
             if trace.name in long_columns_to_plot.values():
-                trace.line.color = "green"  # Long positions
+                trace.marker.color = "green"  # Long positions
             elif trace.name in short_columns_to_plot.values():
-                trace.line.color = "red"  # Short positions
+                trace.marker.color = "red"  # Short positions
 
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig2)
@@ -157,15 +166,18 @@ if st.session_state.dataset_code == "QDL/FON":
         "other_reportable_spreads": "Other Reportable Spreads"
     }
 
-    selected_spread_series = [col for col in spread_columns_to_plot if st.checkbox(f"Show {spread_columns_to_plot[col]}", value=True)]
+    selected_spread_series = [col for col in spread_columns_to_plot if
+                              st.checkbox(f"Show {spread_columns_to_plot[col]}", value=True)]
 
     if selected_spread_series:
-        fig3 = px.bar(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
+        if use_bar_charts:
+            fig3 = px.bar(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
+        else:
+            fig3 = px.line(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
 
         fig3.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig3)
         st.plotly_chart(fig3, use_container_width=True)
-
 
 ######################PLOTTING THE QDL/LFON ONLY HERE#############################
 
