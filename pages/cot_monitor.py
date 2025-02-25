@@ -204,7 +204,7 @@ if st.session_state.dataset_code == "QDL/LFON":
 
     if combined_series:
         fig = plot_function(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type",
-                            barmode='group')
+                            **({"barmode": "group"} if is_chg else {}))
 
         # Market Participation is added as a line overlay
         fig.add_trace(
@@ -228,7 +228,7 @@ if st.session_state.dataset_code == "QDL/LFON":
 
     if selected_spreads:
         fig2 = plot_function(data, x="date", y=selected_spreads, title="Spread Positions by Participant Type",
-                             barmode='group')
+                             **({"barmode": "group"} if is_chg else {}))
 
         # Market Participation overlay
         fig2.add_trace(
