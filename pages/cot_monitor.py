@@ -135,7 +135,7 @@ if st.session_state.dataset_code == "QDL/FON":
     combined_series = selected_long_series + selected_short_series
 
     if combined_series:
-        fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+        fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
 
         # Set colors for longs vs. shorts
         for trace in fig2.data:
@@ -160,7 +160,7 @@ if st.session_state.dataset_code == "QDL/FON":
     selected_spread_series = [col for col in spread_columns_to_plot if st.checkbox(f"Show {spread_columns_to_plot[col]}", value=True)]
 
     if selected_spread_series:
-        fig3 = px.line(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
+        fig3 = px.bar(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
 
         fig3.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig3)
