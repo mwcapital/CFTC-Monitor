@@ -171,57 +171,74 @@ if st.session_state.dataset_code == "QDL/FON":
         st.plotly_chart(fig3, use_container_width=True)
 
 ######################PLOTTING THE QDL/LFON ONLY HERE#############################
+###################### PLOTTING THE QDL/LFON ONLY HERE #############################
 
-# Market Participation Chart
 if st.session_state.dataset_code == "QDL/LFON":
-    st.subheader("Market Participation Over Time")
+    st.subheader("Market Participation & Positions Over Time")
 
-    fig1 = px.line(data, x="date", y="market_participation", title="Market Participation Over Time")
-    fig1.update_layout(legend=dict(orientation="h", y=-0.2))
-    add_highlight_regions(fig1)
-    st.plotly_chart(fig1, use_container_width=True)
+    # Define whether to use bar or line charts based on `_CHG`
+    is_chg = "_CHG" in st.session_state.selected_type_category
+    plot_function = px.bar if is_chg else px.line
 
     # Long & Short Positions Chart
-    st.subheader("Long & Short Positions by Participant Type")
+    longs_columns_to_plot = {
+        "non_commercial_longs": "Non-Commercial Longs",
+        "commercial_longs": "Commercial Longs",
+        "total_reportable_longs": "Total Reportable Longs",
+        "non_reportable_longs": "Non-Reportable Longs"
+    }
 
-    longs_columns_to_plot = [
-        "non_commercial_longs",
-        "commercial_longs",
-        "total_reportable_longs",
-        "non_reportable_longs"
-    ]
-    shorts_columns_to_plot = [
-        "non_commercial_shorts",
-        "commercial_shorts",
-        "total_reportable_shorts",
-        "non_reportable_shorts"
-    ]
+    shorts_columns_to_plot = {
+        "non_commercial_shorts": "Non-Commercial Shorts",
+        "commercial_shorts": "Commercial Shorts",
+        "total_reportable_shorts": "Total Reportable Shorts",
+        "non_reportable_shorts": "Non-Reportable Shorts"
+    }
 
     selected_longs = [col for col in longs_columns_to_plot if
-                      st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+                      st.checkbox(f"Show {longs_columns_to_plot[col]}", value=True)]
     selected_shorts = [col for col in shorts_columns_to_plot if
-                       st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+                       st.checkbox(f"Show {shorts_columns_to_plot[col]}", value=True)]
 
-    if selected_longs or selected_shorts:
-        fig2 = px.line(data, x="date", y=selected_longs + selected_shorts,
-                       title="Long & Short Positions by Participant Type")
-        fig2.update_layout(legend=dict(orientation="h", y=-0.2))
-        add_highlight_regions(fig2)
-        st.plotly_chart(fig2, use_container_width=True)
+    combined_series = selected_longs + selected_shorts
+
+    if combined_series:
+        fig = plot_function(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type",
+                            barmode='group')
+
+        # Market Participation is added as a line overlay
+        fig.add_trace(
+            go.Scatter(x=data["date"], y=data["market_participation"],
+                       mode="lines", name="Market Participation", line=dict(color="black", width=2))
+        )
+
+        fig.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     # Spreads Chart
     st.subheader("Spread Positions by Participant Type")
-    spreads_columns_to_plot = ["non_commercial_spreads"]
+
+    spreads_columns_to_plot = {
+        "non_commercial_spreads": "Non-Commercial Spreads"
+    }
 
     selected_spreads = [col for col in spreads_columns_to_plot if
-                        st.checkbox(f"Show {col.replace('_', ' ').title()}", value=True)]
+                        st.checkbox(f"Show {spreads_columns_to_plot[col]}", value=True)]
 
     if selected_spreads:
-        fig3 = px.line(data, x="date", y=selected_spreads, title="Spread Positions by Participant Type")
-        fig3.update_layout(legend=dict(orientation="h", y=-0.2))
-        add_highlight_regions(fig3)
-        st.plotly_chart(fig3, use_container_width=True)
+        fig2 = plot_function(data, x="date", y=selected_spreads, title="Spread Positions by Participant Type",
+                             barmode='group')
 
+        # Market Participation overlay
+        fig2.add_trace(
+            go.Scatter(x=data["date"], y=data["market_participation"],
+                       mode="lines", name="Market Participation", line=dict(color="black", width=2))
+        )
+
+        fig2.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig2)
+        st.plotly_chart(fig2, use_container_width=True)
 
 ######################PLOTTING THE QDL/FCR ONLY HERE#############################
 
