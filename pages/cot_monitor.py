@@ -106,11 +106,6 @@ def add_highlight_regions(fig):
 if st.session_state.dataset_code == "QDL/FON":
     st.subheader("Market Participation Over Time")
 
-    fig1 = px.line(data, x="date", y="market_participation", title="Market Participation Over Time")
-    fig1.update_layout(legend=dict(orientation="h", y=-0.2))
-    add_highlight_regions(fig1)
-    st.plotly_chart(fig1, use_container_width=True)
-
     # Check if _CHG is in selected type category
     use_bar_charts = "_CHG" in st.session_state.selected_type_category
 
@@ -138,20 +133,14 @@ if st.session_state.dataset_code == "QDL/FON":
     selected_short_series = [col for col in short_columns_to_plot if
                              st.checkbox(f"Show {short_columns_to_plot[col]}", value=True)]
 
-    combined_series = selected_long_series + selected_short_series
+    combined_series = selected_long_series + selected_short_series + ["market_participation"]
 
     if combined_series:
         if use_bar_charts:
-            fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+            fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type",barmode='group')
         else:
             fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
 
-        # Set colors for longs vs. shorts
-        for trace in fig2.data:
-            if trace.name in long_columns_to_plot.values():
-                trace.marker.color = "green"  # Long positions
-            elif trace.name in short_columns_to_plot.values():
-                trace.marker.color = "red"  # Short positions
 
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig2)
@@ -171,7 +160,7 @@ if st.session_state.dataset_code == "QDL/FON":
 
     if selected_spread_series:
         if use_bar_charts:
-            fig3 = px.bar(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
+            fig3 = px.bar(data, x="date", y=selected_spread_series, title="Spreads by Participant Type",barmode='group')
         else:
             fig3 = px.line(data, x="date", y=selected_spread_series, title="Spreads by Participant Type")
 
