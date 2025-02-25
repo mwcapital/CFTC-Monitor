@@ -104,7 +104,6 @@ def add_highlight_regions(fig):
 
 # Market Participation Chart
 if st.session_state.dataset_code == "QDL/FON":
-    st.subheader("Market Participation Over Time")
 
     # Check if _CHG is in selected type category
     use_bar_charts = "_CHG" in st.session_state.selected_type_category
@@ -140,6 +139,11 @@ if st.session_state.dataset_code == "QDL/FON":
             fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type",barmode='group')
         else:
             fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
+
+        # Set colors for longs vs. shorts
+        for trace in fig.data:
+            if trace.name == "market_participation":
+                trace.line.color = "blue"  # Market participation line
 
 
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
