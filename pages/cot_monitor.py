@@ -141,10 +141,9 @@ if st.session_state.dataset_code == "QDL/FON":
             fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
 
         # Set colors for longs vs. shorts
-        for trace in fig.data:
+        for trace in fig2.data:
             if trace.name == "market_participation":
                 trace.line.color = "blue"  # Market participation line
-
 
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig2)
