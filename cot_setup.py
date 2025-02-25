@@ -104,7 +104,7 @@ st.write(f"**Selected Instrument Code:** {instrument_code}")
 use_legacy = st.checkbox("Use Legacy Format", value=False)
 
 # Dropdown for selecting F or FO
-base_type = st.selectbox("Select Base Type", ["F", "FO"])
+base_type = st.selectbox("Select Base Type", ["F", "FO","CITS"])
 
 # Dropdown for selecting _ALL or _CHG
 all_or_chg = st.selectbox("Select Data Type", ["ALL", "CHG"])
