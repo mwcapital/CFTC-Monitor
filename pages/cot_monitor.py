@@ -101,7 +101,7 @@ def add_highlight_regions(fig):
             line_width=2, line_color="black"
         )
 ######################PLOTTING THE QDL/FON ONLY HERE#############################
-######################PLOTTING THE QDL/FON ONLY HERE#############################
+
 # Market Participation Chart
 if st.session_state.dataset_code == "QDL/FON":
     st.subheader("Market Participation Over Time")
