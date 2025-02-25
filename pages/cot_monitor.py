@@ -245,6 +245,9 @@ if st.session_state.dataset_code == "QDL/LFON":
 if st.session_state.dataset_code == "QDL/FCR":
     st.subheader("Concentration Ratios: Largest Traders")
 
+    is_chg = "_CHG" in st.session_state.selected_type_category
+    plot_function = px.bar if is_chg else px.line
+
     concentration_columns = {
         "largest_4_longs_gross": "Top 4 Largest Traders (Gross Long Positions)",
         "largest_4_shorts_gross": "Top 4 Largest Traders (Gross Short Positions)",
@@ -262,7 +265,16 @@ if st.session_state.dataset_code == "QDL/FCR":
     )]
 
     if selected_series:
-        fig = px.line(data, x="date", y=selected_series, title="Concentration Ratios: Largest Traders")
-        fig.update_layout(legend=dict(orientation="h", y=-0.2))
-        add_highlight_regions(fig)
-        st.plotly_chart(fig, use_container_width=True)
+        fig3 = plot_function(data, x="date", y=selected_series, title="Concentration Ratios: Largest Traders",
+                             **({"barmode": "group"} if is_chg else {}))
+
+        # Market Participation overlay
+        fig3.add_trace(
+            go.Scatter(x=data["date"], y=data["market_participation"],
+                       mode="lines", name="Market Participation", line=dict(color="black", width=2))
+        )
+
+        fig3.update_layout(legend=dict(orientation="h", y=-0.2))
+        add_highlight_regions(fig3)
+        st.plotly_chart(fig3, use_container_width=True)
+
