@@ -89,7 +89,7 @@ instrument_code = st.session_state.instrument_mapping[selected_instrument]
 
 
 # Checkbox for Legacy selection
-use_legacy = st.checkbox("Use Legacy Format", value=False)
+use_legacy = st.checkbox("Use Legacy Format if QDL/LFON is selected ", value=False)
 
 # Dropdown for selecting F or FO
 base_type = st.selectbox("Select Base Type", ["F", "FO", "CITS"])
