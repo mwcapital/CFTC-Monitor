@@ -1,10 +1,13 @@
-import nasdaqdatalink
+
 import streamlit as st
+import nasdaqdatalink
 import os
 import toml
-import streamlit as st
-import nasdaqdatalink
+import json
+import pandas as pd
+from functions import generate_highlight_ranges, apply_highlights_to_plot  # Ensure this import exists
 
+# Page configuration
 st.set_page_config(page_title="CFTC Monitor", layout="wide")
 
 # Initialize session state variables if they don’t exist
@@ -19,6 +22,22 @@ if "instrument_code" not in st.session_state:
 
 if "selected_type_category" not in st.session_state:
     st.session_state.selected_type_category = ""
+
+# Strictly load instrument mapping from instruments.json
+instrument_mapping_file = "instruments.json"
+if not os.path.exists(instrument_mapping_file):
+    st.error("instruments.json file not found. Please ensure the file exists in the app directory with the instrument mappings.")
+    st.stop()  # Stop execution if the file doesn’t exist
+
+try:
+    with open(instrument_mapping_file, "r") as f:
+        st.session_state.instrument_mapping = json.load(f)
+except json.JSONDecodeError as e:
+    st.error(f"Error decoding instruments.json: {e}")
+    st.stop()  # Stop execution if the JSON is invalid
+except Exception as e:
+    st.error(f"Error loading instruments.json: {e}")
+    st.stop()  # Stop execution for other file-related errors
 
 # Streamlit UI
 st.title("CFTC - Set Up")
@@ -58,53 +77,22 @@ dataset_code = st.selectbox(
     ["QDL/FON", "QDL/LFON", "QDL/FCR", "QDL/CITS"]
 )
 
-# Instrument selection dropdown with predefined mapping
-instrument_mapping = {
-    "Crude WTI": "067651",
-    "Brent (last day)": "06765T",
-    "GC": "088691",
-    "Nat Gas": "03565B",
-    "10 year e-mini sofr swap": "343603",
-    "eMini S&P500": "13874A",
-    "YM (not sure it is correct)": "124603",
-    "RTY mini": "239742",
-    "NASDAQ MINI": "209742",
-    "Dollar Index": "098662",
-    "6E Euro Index": "6E",
-    "Vix": "1170E1"
-}
 
+
+
+# Instrument selection, addition, and removal
 st.subheader("Instrument Selection")
 
-# Allow user to select from predefined instruments
-selected_instrument = st.selectbox("Select an Instrument", list(instrument_mapping.keys()))
-instrument_code = instrument_mapping[selected_instrument]
+# Allow user to select from predefined instruments (using session state mapping)
+selected_instrument = st.selectbox("Select an Instrument", list(st.session_state.instrument_mapping.keys()))
+instrument_code = st.session_state.instrument_mapping[selected_instrument]
 
-# Section for adding new instruments
-st.write("### Add a New Instrument")
-
-new_instrument_name = st.text_input("Enter Product Name", placeholder="e.g., Copper Futures")
-new_instrument_code = st.text_input("Enter Instrument Code", placeholder="e.g., 123456")
-
-# Button to add the new instrument to the mapping
-if st.button("Add Instrument"):
-    if new_instrument_name and new_instrument_code:
-        instrument_mapping[new_instrument_name] = new_instrument_code
-        st.success(f"Added: {new_instrument_name} ({new_instrument_code})")
-    else:
-        st.warning("Please enter both a product name and a code.")
-
-# Update session state with the selected instrument
-st.session_state.instrument_code = instrument_code
-st.session_state.selected_instrument = selected_instrument
-
-st.write(f"**Selected Instrument Code:** {instrument_code}")
 
 # Checkbox for Legacy selection
 use_legacy = st.checkbox("Use Legacy Format", value=False)
 
 # Dropdown for selecting F or FO
-base_type = st.selectbox("Select Base Type", ["F", "FO","CITS"])
+base_type = st.selectbox("Select Base Type", ["F", "FO", "CITS"])
 
 # Dropdown for selecting _ALL or _CHG
 all_or_chg = st.selectbox("Select Data Type", ["ALL", "CHG"])
@@ -120,10 +108,67 @@ type_category_options = [f"{prefix}_{all_or_chg}{suffix}" for suffix in [""] + s
 # Dropdown for selecting the final Type & Category
 selected_type_category = st.selectbox("Select Type & Category", type_category_options)
 
+
+
+
+
+
+
+
+# Section for managing instruments (add and remove)
+st.write("### Manage Instruments")
+
+# Add a new instrument
+st.write("#### Add a New Instrument")
+new_instrument_name = st.text_input("Enter Product Name", placeholder="e.g., Copper Futures")
+new_instrument_code = st.text_input("Enter Instrument Code", placeholder="e.g., 123456")
+
+if st.button("Add Instrument"):
+    if new_instrument_name and new_instrument_code:
+        st.session_state.instrument_mapping[new_instrument_name] = new_instrument_code
+        # Save updated mapping to file
+        try:
+            with open(instrument_mapping_file, "w") as f:
+                json.dump(st.session_state.instrument_mapping, f, indent=4)
+            st.success(f"Added: {new_instrument_name} ({new_instrument_code})")
+            st.experimental_rerun()  # Refresh the app to update the selectbox and removal options
+        except Exception as e:
+            st.error(f"Error saving instruments.json: {e}")
+    else:
+        st.warning("Please enter both a product name and a code.")
+
+# Remove an instrument
+st.write("#### Remove an Instrument")
+instrument_to_remove = st.selectbox("Select Instrument to Remove", list(st.session_state.instrument_mapping.keys()), index=None)
+if st.button("Remove Instrument"):
+    if instrument_to_remove:
+        if instrument_to_remove == selected_instrument:
+            st.warning("Cannot remove the currently selected instrument. Please select a different instrument first.")
+        else:
+            del st.session_state.instrument_mapping[instrument_to_remove]
+            # Save updated mapping to file
+            try:
+                with open(instrument_mapping_file, "w") as f:
+                    json.dump(st.session_state.instrument_mapping, f, indent=4)
+                st.success(f"Removed: {instrument_to_remove}")
+                st.experimental_rerun()  # Refresh the app to update the selectbox and removal options
+            except Exception as e:
+                st.error(f"Error saving instruments.json: {e}")
+    else:
+        st.warning("Please select an instrument to remove.")
+
+# Update session state with the selected instrument
+st.session_state.instrument_code = instrument_code
+st.session_state.selected_instrument = selected_instrument
+
+st.write(f"**Selected Instrument Code:** {instrument_code}")
+
 # Store parameters in session state
 st.session_state.dataset_code = dataset_code
 st.session_state.instrument_code = instrument_code
 st.session_state.selected_type_category = selected_type_category
+
+
 
 st.write("Go to the **COT Monitor** page to view analysis.")
 
