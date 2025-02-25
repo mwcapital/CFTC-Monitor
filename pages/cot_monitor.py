@@ -132,18 +132,17 @@ if st.session_state.dataset_code == "QDL/FON":
     selected_short_series = [col for col in short_columns_to_plot if
                              st.checkbox(f"Show {short_columns_to_plot[col]}", value=True)]
 
-    combined_series = selected_long_series + selected_short_series + ["market_participation"]
-
+    combined_series = selected_long_series + selected_short_series
     if combined_series:
         if use_bar_charts:
             fig2 = px.bar(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type",barmode='group')
         else:
             fig2 = px.line(data, x="date", y=combined_series, title="Long & Short Positions by Participant Type")
 
-        # Set colors for longs vs. shorts
-        for trace in fig2.data:
-            if trace.name == "market_participation":
-                trace.line.color = "blue"  # Market participation line
+        # Add market participation as a separate line
+        fig2.add_trace(px.line(data, x="date", y="market_participation").data[0])
+        fig2.data[-1].line.color = "blue"  # Ensure market participation is blue
+        fig2.data[-1].name = "Market Participation"
 
         fig2.update_layout(legend=dict(orientation="h", y=-0.2))
         add_highlight_regions(fig2)
