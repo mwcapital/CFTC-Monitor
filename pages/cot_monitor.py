@@ -519,7 +519,7 @@ if st.session_state.dataset_code == "QDL/LFON":
     net_category_colors = {
         "Commercials": "red",
         "Non Commercials Net": "blue",
-        "Non Reportables": "yellow",
+        "Non Reportables": " yellow",
         "Total Net": "green"
     }
 
